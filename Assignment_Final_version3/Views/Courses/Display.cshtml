@@ -1,0 +1,96 @@
+﻿@model IPagedList<Assignment_Final_version3.Models.Course>
+@using PagedList;
+
+@using PagedList.Mvc;
+@{
+    ViewBag.Title = "Display";
+}
+
+<h2>Course List</h2>
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+@using (Html.BeginForm("Display", "Courses", FormMethod.Get))
+{
+    //the following are search options
+    <b> Search Option: </b>@Html.RadioButton("option", "CourseName") <text>Course Name</text>
+    @Html.RadioButton("option", "Credit") <text> Credit </text>
+    @Html.RadioButton("option", "LastName") <text> Teacher's Name </text>
+    @Html.TextBox("search")
+    <input type="submit"
+           name="submit"
+           value="Search" />
+}
+
+<table class="table" border="0">
+
+    <tr>
+        <th>
+            @Html.ActionLink("CourseName", "Display", new
+             {
+                 sort = ViewBag.SortByCourseName,
+              option = Request.QueryString["option"],
+              search = Request.QueryString["search"]
+             })
+        </th>
+        <th>
+            @Html.ActionLink("Credit", "Display", new
+            {
+                sort = ViewBag.SortByCredit,
+             option = Request.QueryString["option"],
+             search = Request.QueryString["search"]
+            })
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.First().Teacher.FirstName)
+        </th>
+        <th>@Html.DisplayNameFor(model => model.First().Teacher.LastName)</th>
+    </tr>
+    @if (Model.Count() == 0)
+    {
+        <tr>
+            <td colspan="3"> Records not found </td>
+        </tr>
+    }
+    else
+    {
+
+        foreach (var item in Model)
+        {
+<tr>
+    <td>
+        @Html.DisplayFor(modelItem => item.CourseName)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Credits)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Teacher.LastName)
+    </td>
+    <td>
+        @Html.DisplayFor(modelItem => item.Teacher.FirstName)
+    </td>
+    @if (User.IsInRole("Admin"))
+    {
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id = item.CourseId }) |
+            @Html.ActionLink("Details", "Details", new { id = item.CourseId }) |
+            @Html.ActionLink("Delete", "Delete", new { id = item.CourseId })
+        </td>
+    }
+    </tr>
+        }
+    }
+    
+</table>
+@Html.PagedListPager(Model, pageNumber => Url.Action("Display", new
+{
+    pageNumber,
+    option = Request.QueryString["option"],
+    search = Request.QueryString["search"],
+    sort = Request.QueryString["sort"]
+}))
+
+<div>
+    @Html.ActionLink("Back to List", "Display")
+</div>
